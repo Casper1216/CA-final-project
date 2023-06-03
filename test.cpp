@@ -3,7 +3,8 @@
 #include<iostream>
 
 int main(){
-	cout<<"test OK"<<endl;
+	std::cout<<"recover OK"<<std::endl;
+	
 	
 return 0;
 }
