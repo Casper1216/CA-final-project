@@ -1,7 +1,7 @@
 //one dimension FFT
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
-#include "../utils/Complex.cu"
+#include "Complex.cu"
 #include <iostream>
 #include <string>
 #include <stdlib.h>
