@@ -7,6 +7,10 @@
 #include <stdlib.h>
 #include<stdio.h>
 #include <time.h>
+#include<iostream>
+#include<fstream>
+
+using namespace std;
 //#include <Windows.h>
 
 int GetBits(int n) {
@@ -65,8 +69,10 @@ void printSequence(Complex nums[], const int N) {
 int main() {
     srand(time(0));
     
-    const int TPB = 1024;
-    const int N = 1024 * 32;
+    //const int TPB = 1024;
+    //const int N = 1024 * 32;
+    const int TPB = 128;
+    const int N = 128 * 32;
     const int bits = GetBits(N);
 
     Complex *nums = (Complex*)malloc(sizeof(Complex) * N), *dNums, *dResult;
@@ -97,14 +103,38 @@ int main() {
     //float cost = GetTickCount() - s;
     //printf("After FFT: \n");
     //printSequence(nums, N);
-    //rintf("Time of Transfromation: %fms", cost);
+    //printf("Time of Transfromation: %fms", cost);
     // Record the end time
     time_t end = clock();
     double diff = end - start; // ms
-    printf(" %f  sec\n", diff / CLOCKS_PER_SEC );
+    printf(" %f  sec\n", diff / CLOCKS_PER_SEC);
 
     printf("END \n");
+    
 
+//-------------write output-------------------------
+	ofstream ofs;
+	ofs.open("FFT_output.txt");
+	if(!ofs.is_open()){
+		cout<<"Fail to open"<<endl;
+		return 1;	
+	}
+	ofs<<"[";
+	for (int i = 0; i < N; ++i) {
+		double real = nums[i].real, imag = nums[i].imag;
+		if (imag == 0)
+			ofs<<real;
+		else {
+		    if (imag > 0) 
+			ofs<<real<<"+"<<imag<<"i";
+		    else 
+			ofs<<real<<imag<<"i";	//printf("%.16f%.16fi", real, imag);
+		}
+		if (i != N - 1) 
+			ofs<<", ";
+	}
+	ofs<<"]\n";
+//------------------------------------------------
     free(nums);
     cudaFree(dNums);
     cudaFree(dResult);
