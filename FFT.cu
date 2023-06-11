@@ -5,8 +5,9 @@
 #include <iostream>
 #include <string>
 #include <stdlib.h>
+#include<stdio.h>
 #include <time.h>
-#include <Windows.h>
+//#include <Windows.h>
 
 int GetBits(int n) {
     int bits = 0;
@@ -63,6 +64,7 @@ void printSequence(Complex nums[], const int N) {
 
 int main() {
     srand(time(0));
+    
     const int TPB = 1024;
     const int N = 1024 * 32;
     const int bits = GetBits(N);
@@ -74,8 +76,13 @@ int main() {
     printf("Length of Sequence: %d\n", N);
     // printf("Before FFT: \n");
     // printSequence(nums, N);
+	
 
-    float s = GetTickCount();
+    // Start Record the time
+    time_t  start = clock();
+    //float s = GetTickCount();
+    //***************************************************************************
+    
 
     cudaMalloc((void**)&dNums, sizeof(Complex) * N);
     cudaMalloc((void**)&dResult, sizeof(Complex) * N);
@@ -87,10 +94,16 @@ int main() {
 
     cudaMemcpy(nums, dResult, sizeof(Complex) * N, cudaMemcpyDeviceToHost);
 
-    float cost = GetTickCount() - s;
-    // printf("After FFT: \n");
-    // printSequence(nums, N);
-    printf("Time of Transfromation: %fms", cost);
+    //float cost = GetTickCount() - s;
+    //printf("After FFT: \n");
+    //printSequence(nums, N);
+    //rintf("Time of Transfromation: %fms", cost);
+    // Record the end time
+    time_t end = clock();
+    double diff = end - start; // ms
+    printf(" %f  sec\n", diff / CLOCKS_PER_SEC );
+
+    printf("END \n");
 
     free(nums);
     cudaFree(dNums);
