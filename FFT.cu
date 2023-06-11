@@ -69,10 +69,10 @@ void printSequence(Complex nums[], const int N) {
 int main() {
     srand(time(0));
     
-    //const int TPB = 1024;
+    const int TPB = 1024;
+    const int N = 1024 * 32;
+    //onst int TPB = 512;
     //const int N = 1024 * 32;
-    const int TPB = 128;
-    const int N = 128 * 32;
     const int bits = GetBits(N);
 
     Complex *nums = (Complex*)malloc(sizeof(Complex) * N), *dNums, *dResult;
@@ -119,7 +119,7 @@ int main() {
 		cout<<"Fail to open"<<endl;
 		return 1;	
 	}
-	ofs<<"[";
+	
 	for (int i = 0; i < N; ++i) {
 		double real = nums[i].real, imag = nums[i].imag;
 		if (imag == 0)
@@ -131,9 +131,9 @@ int main() {
 			ofs<<real<<imag<<"i";	//printf("%.16f%.16fi", real, imag);
 		}
 		if (i != N - 1) 
-			ofs<<", ";
+			ofs<<"\n";
 	}
-	ofs<<"]\n";
+	
 //------------------------------------------------
     free(nums);
     cudaFree(dNums);
