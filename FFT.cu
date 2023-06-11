@@ -24,7 +24,7 @@ __device__ int br(int i, int bits) {
     return r;
 }
 
-__device__ void Bufferfly(Complex *a, Complex *b, Complex factor) {
+__device__ void Bufferfly(Complex *a, Complex *b, Complex factor) { //把N個時間點做平行化
     Complex a1 = (*a) + factor * (*b);
     Complex b1 = (*a) - factor * (*b);
     *a = a1;
