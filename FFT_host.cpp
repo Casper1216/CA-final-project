@@ -7,7 +7,7 @@
 #include<stdio.h>
 #include <time.h>
 using namespace std;
-//#include <Windows.h>
+
 
 int GetBits(int n) {
     int bits = 0;
@@ -16,17 +16,6 @@ int GetBits(int n) {
     }
     return bits;
 }
-
-int br(int i, int bits) {   //bit reverse
-    int r = 0;
-    do {
-        r += i % 2 << --bits;
-    } while (i /= 2);
-    return r;
-}
-
-
-
 
 vector<Complex> FFT(vector<Complex>& x) {
     if(x.size()==1)
@@ -83,31 +72,14 @@ int main() {
     for (int i = 0; i < N; ++i) {
         nums[i] = nums[i].GetRandomReal();
     }
-    // printf("Length of Sequence: %d\n", N);
-    // cout<<"Before FFT"<<endl;
-    // printSequence(nums, N);
-	// cout<<endl;
-
-    // Start Record the time
-    time_t  start = clock();
-    //float s = GetTickCount();
-    //***************************************************************************
-    
+    printf("Length of Sequence: %d\n", N);
+    cout<<"Before FFT"<<endl;
+    printSequence(nums, N);
+	cout<<endl;
     res = FFT(nums);
 
-    //***************************************************************************
-
-    // Record the end time
-    time_t end = clock();
-    double diff = end - start; // ms
-    printf(" %f  sec\n", diff / CLOCKS_PER_SEC );
-
-
-
-    // cout<<"After FFT"<<endl;
-    // printSequence(res, N);
-    // cout<<endl;
-    // printf("END \n");
+    cout<<"After FFT"<<endl;
+    printSequence(nums, N);
 
     
 }

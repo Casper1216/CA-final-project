@@ -7,11 +7,10 @@
 #include <stdlib.h>
 #include<stdio.h>
 #include <time.h>
-#include<iostream>
-#include<fstream>
+
 
 using namespace std;
-//#include <Windows.h>
+
 
 int GetBits(int n) {
     int bits = 0;
@@ -29,7 +28,7 @@ __device__ int br(int i, int bits) {
     return r;
 }
 
-__device__ void Bufferfly(Complex *a, Complex *b, Complex factor) { //把N個時間點做平行化
+__device__ void Bufferfly(Complex* a, Complex* b, Complex factor) { 
     Complex a1 = (*a) + factor * (*b);
     Complex b1 = (*a) - factor * (*b);
     *a = a1;
@@ -68,74 +67,53 @@ void printSequence(Complex nums[], const int N) {
 
 int main() {
     srand(time(0));
-    
+
     const int TPB = 1024;
-    const int N = 1024 * 32;
-    //onst int TPB = 512;
-    //const int N = 1024 * 32;
+    const int N = 1024 * 32;        //FFT point
+    
     const int bits = GetBits(N);
 
-    Complex *nums = (Complex*)malloc(sizeof(Complex) * N), *dNums, *dResult;
+    float elapsedTime;
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+
+
+    Complex* nums = (Complex*)malloc(sizeof(Complex) * N), * dNums, * dResult;
     for (int i = 0; i < N; ++i) {
         nums[i] = Complex::GetRandomReal();
     }
     printf("Length of Sequence: %d\n", N);
-    // printf("Before FFT: \n");
-    // printSequence(nums, N);
-	
 
-    // Start Record the time
-    time_t  start = clock();
-    //float s = GetTickCount();
-    //***************************************************************************
-    
 
     cudaMalloc((void**)&dNums, sizeof(Complex) * N);
     cudaMalloc((void**)&dResult, sizeof(Complex) * N);
     cudaMemcpy(dNums, nums, sizeof(Complex) * N, cudaMemcpyHostToDevice);
-    
-    dim3 threadPerBlock(TPB);
-    dim3 blockNum((N + threadPerBlock.x - 1) / threadPerBlock.x);
-    FFT<<<blockNum, threadPerBlock>>>(dNums, dResult, N, bits);
 
+    dim3 threadPerBlock(TPB);
+    dim3 blockNum(N / TPB);
+    //dim3 blockNum((N + threadPerBlock.x - 1) / threadPerBlock.x);
+
+    //----------------------Start Record the time---------------------
+    cudaEventRecord(start, 0); //keep start time
+
+    FFT << <threadPerBlock, blockNum >> > (dNums, dResult, N, bits);
+
+
+    //----------------------END Record the time---------------------
+    cudaEventRecord(stop, 0); //keep stop time
+    cudaEventSynchronize(start); //wait stop event
+    cudaEventSynchronize(stop); //wait stop event
+    cudaEventElapsedTime(&elapsedTime, start, stop);
+    printf("Time (GPU) : %f ms \n", elapsedTime);
+        
+    cudaEventDestroy(start);
+    cudaEventDestroy(stop);
+    //---------------------------------------------------------------
     cudaMemcpy(nums, dResult, sizeof(Complex) * N, cudaMemcpyDeviceToHost);
 
-    //float cost = GetTickCount() - s;
-    //printf("After FFT: \n");
-    //printSequence(nums, N);
-    //printf("Time of Transfromation: %fms", cost);
-    // Record the end time
-    time_t end = clock();
-    double diff = end - start; // ms
-    printf(" %f  sec\n", diff / CLOCKS_PER_SEC);
-
-    printf("END \n");
-    
-
-//-------------write output-------------------------
-	ofstream ofs;
-	ofs.open("FFT_output.txt");
-	if(!ofs.is_open()){
-		cout<<"Fail to open"<<endl;
-		return 1;	
-	}
-	
-	for (int i = 0; i < N; ++i) {
-		double real = nums[i].real, imag = nums[i].imag;
-		if (imag == 0)
-			ofs<<real;
-		else {
-		    if (imag > 0) 
-			ofs<<real<<"+"<<imag<<"i";
-		    else 
-			ofs<<real<<imag<<"i";	//printf("%.16f%.16fi", real, imag);
-		}
-		if (i != N - 1) 
-			ofs<<"\n";
-	}
-	
-//------------------------------------------------
     free(nums);
     cudaFree(dNums);
     cudaFree(dResult);
+
 }
