@@ -52,12 +52,16 @@ void printSequence(vector<Complex>& nums, const int N) {
     
     for (int i = 0; i < N; ++i) {
         double real = nums[i].real, imag = nums[i].imag;
-        if (imag == 0) printf("%.4f", real);
+        if (imag == 0) 
+            printf("%.4f", real);
         else {
-            if (imag > 0) printf("%.4f+%.4fi", real, imag);
-            else printf("%.4f%.4fi", real, imag);
+            if (imag > 0) 
+                printf("%.4f+%.4fi", real, imag);
+            else 
+                printf("%.4f%.4fi", real, imag);
         }
-        if (i != N - 1) printf(" ");
+        
+        printf("\n");
     }
     
 }
@@ -65,7 +69,7 @@ void printSequence(vector<Complex>& nums, const int N) {
 int main() {
     srand(time(0));
     
-    const int N = 1024*32;        //FFT points
+    const int N = 128*32;        //FFT points
 
     vector<Complex> nums(N);
     vector<Complex> res(N);
@@ -75,7 +79,8 @@ int main() {
     printf("Length of Sequence: %d\n", N);
     cout<<"Before FFT"<<endl;
     printSequence(nums, N);
-	cout<<endl;
+	
+
     res = FFT(nums);
 
     cout<<"After FFT"<<endl;

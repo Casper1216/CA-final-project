@@ -52,24 +52,28 @@ __global__ void FFT(Complex nums[], Complex result[], int n, int bits) {
 }
 
 void printSequence(Complex nums[], const int N) {
-    printf("[");
+    
     for (int i = 0; i < N; ++i) {
         double real = nums[i].real, imag = nums[i].imag;
-        if (imag == 0) printf("%.16f", real);
+        if (imag == 0) 
+            printf("%.4f", real);
         else {
-            if (imag > 0) printf("%.16f+%.16fi", real, imag);
-            else printf("%.16f%.16fi", real, imag);
+            if (imag > 0) 
+                printf("%.4f+%.4fi", real, imag);
+            else 
+                printf("%.4f%.4fi", real, imag);
         }
-        if (i != N - 1) printf(", ");
+        
+        printf("\n");
     }
-    printf("]\n");
+    
 }
 
 int main() {
     srand(time(0));
 
-    const int TPB = 1024;
-    const int N = 1024 * 32;        //FFT point
+    const int TPB = 128;
+    const int N = 128 * 32;        //FFT point
     
     const int bits = GetBits(N);
 
@@ -84,7 +88,8 @@ int main() {
         nums[i] = Complex::GetRandomReal();
     }
     printf("Length of Sequence: %d\n", N);
-
+    cout<<"Before FFT"<<endl;
+    printSequence(nums, N);
 
     cudaMalloc((void**)&dNums, sizeof(Complex) * N);
     cudaMalloc((void**)&dResult, sizeof(Complex) * N);
@@ -92,7 +97,7 @@ int main() {
 
     dim3 threadPerBlock(TPB);
     dim3 blockNum(N / TPB);
-    //dim3 blockNum((N + threadPerBlock.x - 1) / threadPerBlock.x);
+    
 
     //----------------------Start Record the time---------------------
     cudaEventRecord(start, 0); //keep start time
@@ -106,12 +111,13 @@ int main() {
     cudaEventSynchronize(stop); //wait stop event
     cudaEventElapsedTime(&elapsedTime, start, stop);
     printf("Time (GPU) : %f ms \n", elapsedTime);
-        
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
     //---------------------------------------------------------------
     cudaMemcpy(nums, dResult, sizeof(Complex) * N, cudaMemcpyDeviceToHost);
 
+    cout<<"After FFT"<<endl;
+    printSequence(nums, N);
     free(nums);
     cudaFree(dNums);
     cudaFree(dResult);
